@@ -183,6 +183,16 @@
             font-size: 0.8em;
             width: fit-content;
         }
+        
+        /* Estilo da mensagem de rodapé */
+        .admin-contact {
+            display: block;
+            margin-top: 10px;
+            padding-top: 5px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            color: #555;
+        }
 
         /* Modal de Tópicos */
         .modal {
@@ -251,7 +261,7 @@
             <div class="input-area">
                 <input type="text" id="user-input" placeholder="Digite sua pergunta...">
                 <button id="send-btn" title="Enviar">▶️</button>
-                <button id="clear-btn" title="Limpar Pesquisa">🧹</button>
+                <button id="clear-btn" title="Reiniciar Chat">🧹</button>
             </div>
         </div>
     </div>
@@ -316,7 +326,7 @@
             const chatBody = document.getElementById('chat-body');
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
-            const clearBtn = document.getElementById('clear-btn'); // Elemento do botão Limpar
+            const clearBtn = document.getElementById('clear-btn');
             const topicBtn = document.getElementById('topic-btn');
             const topicModal = document.getElementById('topic-modal');
             const topicList = document.getElementById('topic-list');
@@ -331,7 +341,6 @@
                 return messageDiv;
             }
 
-            // Função para adicionar o indicador de digitação (os 3 pontinhos)
             function addTypingIndicator() {
                 const indicatorDiv = document.createElement('div');
                 indicatorDiv.className = 'message bot-message typing-indicator';
@@ -347,7 +356,9 @@
                 shareBtn.textContent = '🔗 Compartilhar Resposta';
                 shareBtn.className = 'share-btn';
                 shareBtn.onclick = () => {
-                    const fullText = `Resposta do ChatBelize sobre o Regulamento: \n\n${textToShare.trim()}`; 
+                    // Limpa o texto para compartilhamento, removendo a mensagem de contato final
+                    const cleanText = textToShare.split('<br><br>')[0].trim();
+                    const fullText = `Resposta do ChatBelize sobre o Regulamento: \n\n${cleanText}`; 
                     
                     if (navigator.share) {
                         navigator.share({
@@ -393,6 +404,10 @@
                             }
                         }
                     }
+                    
+                    // NOVO: Adicionar mensagem final de contato
+                    const closingMessage = '<span class="admin-contact">Para maiores informações entre em contato com a administração</span>';
+                    response += closingMessage;
 
                     // 4. Mostrar a resposta final
                     const botMessageElement = addMessage(response, 'bot');
@@ -419,8 +434,13 @@
                 }
             });
 
-            // Evento 3: Botão Limpar Pesquisa (FIXED)
+            // Evento 3: Botão Limpar Pesquisa (REINICIAR CHAT)
             clearBtn.addEventListener('click', () => {
+                // Limpa todo o conteúdo do chat
+                chatBody.innerHTML = ''; 
+                // Adiciona a mensagem inicial
+                addMessage("Olá! Sou o ChatBelize. Em que posso ajudar você com o Regulamento Interno? Escolha um tópico ou digite sua pergunta.", 'bot');
+                // Limpa o input e foca nele
                 userInput.value = '';
                 userInput.focus();
             });
