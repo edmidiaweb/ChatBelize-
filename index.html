@@ -1,28 +1,40 @@
-<!doctype html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <link rel="icon" type="image/png" href="%VITE_APP_LOGO%" />
-    <link rel="apple-touch-icon" href="%VITE_APP_LOGO%" />
-    <title>%VITE_APP_TITLE%</title>
-    <!-- Add Google Fonts here, example:
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    -->
-  </head>
-
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
-  </body>
-
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBelize</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="chat-header">
+            <h3>💬 ChatBelize - Regulamento Interno</h3>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="message bot-message">Olá! Sou o ChatBelize. Em que posso ajudar você com o Regulamento Interno? Escolha um tópico ou digite sua pergunta.</div>
+        </div>
+        <div class="chat-footer">
+            <div class="topic-button-area">
+                <button id="topic-btn" title="Tópicos Principais">📑 Tópicos</button>
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Digite sua pergunta...">
+                <button id="send-btn" title="Enviar">▶️</button>
+                <button id="clear-btn" title="Limpar Pesquisa">🧹</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="topic-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h4>Selecione um Tópico:</h4>
+            <div id="topic-list">
+                </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
 </html>
