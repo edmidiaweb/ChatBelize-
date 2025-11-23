@@ -81,6 +81,41 @@
             box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
         }
 
+        /* Efeito de digitação (3 pontinhos) */
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; }
+            33% { opacity: 1; }
+            66% { opacity: 0.2; }
+        }
+
+        .typing-indicator {
+            background-color: var(--whatsapp-bot-bubble);
+            color: #000;
+            margin-right: auto;
+            border-radius: 0 8px 8px 8px;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+            padding: 8px 12px;
+            width: fit-content;
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background-color: #555;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+
         /* Rodapé e Área de Input */
         .chat-footer {
             padding: 10px;
@@ -281,7 +316,7 @@
             const chatBody = document.getElementById('chat-body');
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
-            const clearBtn = document.getElementById('clear-btn');
+            const clearBtn = document.getElementById('clear-btn'); // Elemento do botão Limpar
             const topicBtn = document.getElementById('topic-btn');
             const topicModal = document.getElementById('topic-modal');
             const topicList = document.getElementById('topic-list');
@@ -294,6 +329,17 @@
                 chatBody.appendChild(messageDiv);
                 chatBody.scrollTop = chatBody.scrollHeight;
                 return messageDiv;
+            }
+
+            // Função para adicionar o indicador de digitação (os 3 pontinhos)
+            function addTypingIndicator() {
+                const indicatorDiv = document.createElement('div');
+                indicatorDiv.className = 'message bot-message typing-indicator';
+                indicatorDiv.id = 'typing-dots';
+                indicatorDiv.innerHTML = '<span></span><span></span><span></span>';
+                chatBody.appendChild(indicatorDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+                return indicatorDiv;
             }
 
             function addShareButton(messageElement, textToShare) {
@@ -320,29 +366,38 @@
             }
 
             function generateResponse(query) {
-                let response = "Desculpe, não encontrei informações específicas sobre isso no regulamento. Tente usar o botão '📑 Tópicos' ou reformular sua pergunta com palavras-chave.";
+                // 1. Mostrar o indicador de digitação
+                const indicator = addTypingIndicator();
                 
-                // Normalização da busca (convertendo a consulta do usuário para minúsculas)
-                const normalizedQuery = query.toLowerCase().trim();
+                // 2. Atrasar a resposta em 1 segundo
+                setTimeout(() => {
+                    // 3. Remover o indicador após o atraso
+                    indicator.remove();
 
-                // 1. Busca por Tópico exato
-                if (regulamentoData[query]) {
-                    response = regulamentoData[query];
-                } else {
-                    // 2. Busca por palavra-chave: pesquisa no TÓPICO (Chave) E no CONTEÚDO (Valor)
-                    for (const topic in regulamentoData) {
-                        const topicContent = regulamentoData[topic].toLowerCase();
-                        
-                        // Verifica se a palavra-chave está no Título do Tópico OU no Conteúdo do Artigo
-                        if (topic.toLowerCase().includes(normalizedQuery) || topicContent.includes(normalizedQuery)) {
-                            response = regulamentoData[topic];
-                            break;
+                    let response = "Desculpe, não encontrei informações específicas sobre isso no regulamento. Tente usar o botão '📑 Tópicos' ou reformular sua pergunta com palavras-chave.";
+                    
+                    // Lógica de busca
+                    const normalizedQuery = query.toLowerCase().trim();
+
+                    // Busca 1: Tópico exato
+                    if (regulamentoData[query]) {
+                        response = regulamentoData[query];
+                    } else {
+                        // Busca 2: Palavra-chave no Tópico ou no Conteúdo
+                        for (const topic in regulamentoData) {
+                            const topicContent = regulamentoData[topic].toLowerCase();
+                            
+                            if (topic.toLowerCase().includes(normalizedQuery) || topicContent.includes(normalizedQuery)) {
+                                response = regulamentoData[topic];
+                                break;
+                            }
                         }
                     }
-                }
 
-                const botMessageElement = addMessage(response, 'bot');
-                addShareButton(botMessageElement, response);
+                    // 4. Mostrar a resposta final
+                    const botMessageElement = addMessage(response, 'bot');
+                    addShareButton(botMessageElement, response);
+                }, 1000); // 1000 milissegundos = 1 segundo
             }
 
             // --- Eventos ---
@@ -364,7 +419,7 @@
                 }
             });
 
-            // Evento 3: Botão Limpar Pesquisa
+            // Evento 3: Botão Limpar Pesquisa (FIXED)
             clearBtn.addEventListener('click', () => {
                 userInput.value = '';
                 userInput.focus();
@@ -373,7 +428,6 @@
             // Evento 4: Botão Tópicos (Abre Modal)
             topicBtn.addEventListener('click', () => {
                 topicList.innerHTML = '';
-                // Cria e popula os botões de tópico
                 for (const topic in regulamentoData) {
                     const topicButton = document.createElement('button');
                     topicButton.textContent = `➡️ ${topic}`;
@@ -388,12 +442,10 @@
                 topicModal.style.display = 'block';
             });
 
-            // Evento 5: Fechar Modal pelo 'x'
+            // Evento 5 & 6: Fechar Modal
             closeModalBtn.addEventListener('click', () => {
                 topicModal.style.display = 'none';
             });
-            
-            // Evento 6: Fechar Modal clicando fora
             window.onclick = (event) => {
                 if (event.target === topicModal) {
                     topicModal.style.display = 'none';
